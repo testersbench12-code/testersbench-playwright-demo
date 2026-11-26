@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TestersBench Demo Form</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 1.5rem; }
+    nav a { margin-right: 1rem; }
+    .error { color: #b00020; min-height: 1.25rem; }
+    .success { color: #0a7a28; }
+    label { display: block; margin-top: 0.75rem; }
+    input, button { margin-top: 0.25rem; padding: 0.4rem 0.6rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav aria-label="Main">
+      <a data-testid="nav-home" href="index.html">Home</a>
+      <a data-testid="nav-form" href="form.html">Form</a>
+      <a data-testid="nav-items" href="items.html">Items</a>
+    </nav>
+  </header>
+  <main>
+    <h1 data-testid="form-title">Contact form</h1>
+    <form id="contact-form" novalidate>
+      <label>Name
+        <input data-testid="input-name" name="name" type="text" />
+      </label>
+      <p class="error" data-testid="error-name"></p>
+      <label>Email
+        <input data-testid="input-email" name="email" type="email" />
+      </label>
+      <p class="error" data-testid="error-email"></p>
+      <button data-testid="btn-submit" type="submit">Submit</button>
+    </form>
+    <p class="success" data-testid="form-success" hidden>Form submitted successfully</p>
+  </main>
+  <script>
+    const form = document.getElementById('contact-form');
+    const nameInput = document.querySelector('[data-testid="input-name"]');
+    const emailInput = document.querySelector('[data-testid="input-email"]');
+    const nameError = document.querySelector('[data-testid="error-name"]');
+    const emailError = document.querySelector('[data-testid="error-email"]');
+    const success = document.querySelector('[data-testid="form-success"]');
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      nameError.textContent = '';
+      emailError.textContent = '';
+      success.hidden = true;
+
+      let valid = true;
+      if (!nameInput.value.trim()) {
+        nameError.textContent = 'Name is required';
+        valid = false;
+      }
+      if (!emailInput.value.trim()) {
+        emailError.textContent = 'Email is required';
+        valid = false;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim())) {
+        emailError.textContent = 'Enter a valid email';
+        valid = false;
+      }
+
+      if (valid) {
+        success.hidden = false;
+      }
+    });
+  </script>
+</body>
+</html>

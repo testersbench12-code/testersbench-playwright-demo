@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TestersBench Demo Items</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 1.5rem; }
+    nav a { margin-right: 1rem; }
+    li { margin: 0.35rem 0; }
+    button { margin-left: 0.5rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav aria-label="Main">
+      <a data-testid="nav-home" href="index.html">Home</a>
+      <a data-testid="nav-form" href="form.html">Form</a>
+      <a data-testid="nav-items" href="items.html">Items</a>
+    </nav>
+  </header>
+  <main>
+    <h1 data-testid="items-title">Items</h1>
+    <input data-testid="item-input" type="text" placeholder="New item" />
+    <button data-testid="item-add" type="button">Add</button>
+    <ul data-testid="item-list"></ul>
+    <p data-testid="item-empty">No items yet</p>
+  </main>
+  <script>
+    const input = document.querySelector('[data-testid="item-input"]');
+    const addBtn = document.querySelector('[data-testid="item-add"]');
+    const list = document.querySelector('[data-testid="item-list"]');
+    const empty = document.querySelector('[data-testid="item-empty"]');
+    let items = [];
+
+    function render() {
+      list.innerHTML = '';
+      empty.hidden = items.length > 0;
+      items.forEach((text, index) => {
+        const li = document.createElement('li');
+        li.setAttribute('data-testid', 'item-row');
+        li.innerHTML = `<span data-testid="item-text">${text}</span>
+          <button data-testid="item-delete" data-index="${index}" type="button">Delete</button>`;
+        list.appendChild(li);
+      });
+    }
+
+    addBtn.addEventListener('click', () => {
+      const value = input.value.trim();
+      if (!value) return;
+      items.push(value);
+      input.value = '';
+      render();
+    });
+
+    list.addEventListener('click', (event) => {
+      const target = event.target;
+      if (target && target.matches('[data-testid="item-delete"]')) {
+        const index = Number(target.getAttribute('data-index'));
+        items.splice(index, 1);
+        render();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
