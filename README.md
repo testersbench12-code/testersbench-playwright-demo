@@ -1,66 +1,47 @@
 # TestersBench Playwright + TypeScript Demo
 
-Standalone Playwright + TypeScript demo repository showcasing an end-to-end woman registration, profile verification, and admin approval flow.
+[![Playwright Tests](https://github.com/testersbench12-code/testersbench-playwright-demo/actions/workflows/playwright.yml/badge.svg)](https://github.com/testersbench12-code/testersbench-playwright-demo/actions/workflows/playwright.yml)
 
-> This repo is isolated from the original Freya project. Source tests/helpers were **copied** (not moved) into this demo.
+**Instant proof for SaaS founders, CTOs, and engineering leads** — open this repo, see the green CI badge, clone, run tests, and download the HTML report. No video required.
 
-## Prerequisites
+## What this proves
 
-- Node.js 18+ (20 recommended)
-- Google Chrome (used with a persistent profile for Outlook OTP / camera flows)
-- For the optional live Freya E2E: copy `.env.example` → `.env` and set credentials/URLs (never commit `.env`)
-- Local ID images path: `ID_VERIFICATION_IMAGE_FOLDER` in `.env`
+A production-style **Playwright + TypeScript** suite with local, deterministic fixtures (no flaky third-party dependency for the core pack). Covered SaaS QA areas:
 
-## Setup
+| Area | What you get |
+|------|----------------|
+| **Smoke & Navigation** | Home loads; nav across Form / Items / Home |
+| **Form Validation** | Required fields + invalid/valid email handling |
+| **Core User Flows** | Add/delete list item (CRUD / state) |
+| **Responsive Viewports** | Mobile (375) and desktop (1280) checks |
+| **Negative / Error Handling** | 404 page + broken-link recovery |
+
+Optional live Freya woman register → verify → admin approve E2E remains in-repo (`RUN_LIVE_E2E=1` + `.env`); default CI/local runs use the core pack above.
+
+## Run locally (copy-paste)
 
 ```bash
 npm install
-npx playwright install chromium
-cp .env.example .env   # then edit .env for live E2E only
-```
-
-## Run tests
-
-Default run (local core SaaS demos, no secrets needed):
-
-```bash
+npx playwright install
 npx playwright test
-# or: npm test
-```
-
-Live Freya woman E2E (requires `.env` + Chrome):
-
-```bash
-# PowerShell: $env:RUN_LIVE_E2E=1; npx playwright test
-RUN_LIVE_E2E=1 npx playwright test --grep womanRegisterVerifyAndApproveInAdmin
-```
-
-## HTML report
-
-After a run, view the HTML report:
-
-```bash
-npm run test:report
-```
-
-Or:
-
-```bash
 npx playwright show-report
 ```
 
-## Project layout
+Node.js 18+ (20 recommended). Core tests need no secrets. For live E2E only: copy `.env.example` → `.env` (never commit `.env`).
 
-```
-tests/admin/          # Playwright specs
-src/fixtures.ts       # Persistent Chrome context fixture
-src/config.ts         # URLs / credentials / field values
-src/helpers/          # OTP, seeding, DOM helpers
-src/pages/            # Page objects
-playwright.config.ts
-.github/workflows/    # CI workflow
-```
+## CI / proof artifact
 
-## CI
+On every `push` and `pull_request`, GitHub Actions runs `npx playwright test` and **always uploads** the `playwright-report` artifact — download it from the Actions run page to audit results without a local install.
 
-GitHub Actions workflow (`.github/workflows/playwright.yml`) runs on every `push` and `pull_request`, installs Chromium, executes `npx playwright test`, and always uploads `playwright-report/` as an artifact.
+Workflow: [`.github/workflows/playwright.yml`](.github/workflows/playwright.yml)
+
+## TestersBench
+
+[TestersBench](https://testersbench.netlify.app) helps SaaS teams ship reliable QA faster:
+
+- **14-day 0-to-1 Playwright setups** — first green suite in two weeks
+- **Legacy suite migrations** — Selenium/Cypress → Playwright without rewriting your product
+- **Dedicated QA retainers** — ongoing coverage as you ship
+- **Manual + automation collaboration** — explorers and pipelines working together
+
+→ Start at [testersbench.netlify.app](https://testersbench.netlify.app)
