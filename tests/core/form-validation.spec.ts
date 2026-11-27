@@ -1,26 +1,38 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../../src/fixtures/demoFixtures';
 
-test.describe('Form input & validation', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/form.html');
+test.describe('Form input & validation (API + UI)', () => {
+  test.beforeEach(async ({ formPage }) => {
+    await formPage.open();
   });
 
-  test('shows required validation when submitting empty form', async ({ page }) => {
-    await page.getByTestId('btn-submit').click();
-    await expect(page.getByTestId('error-name')).toHaveText('Name is required');
-    await expect(page.getByTestId('error-email')).toHaveText('Email is required');
-    await expect(page.getByTestId('form-success')).toBeHidden();
+  test('shows required validation when submitting empty form', async ({ formPage }) => {
+    const response = await formPage.submitAndWaitForApi();
+    expect(response.status()).toBe(400);
+    const body = await response.json();
+    expect(body.ok).toBeFalsy();
+    expect(body.errors.name).toBe('Name is required');
+    expect(body.errors.email).toBe('Email is required');
+
+    await expect(formPage.nameError).toHaveText('Name is required');
+    await expect(formPage.emailError).toHaveText('Email is required');
+    await expect(formPage.successMessage).toBeHidden();
   });
 
-  test('rejects invalid email and accepts valid input', async ({ page }) => {
-    await page.getByTestId('input-name').fill('Ada Lovelace');
-    await page.getByTestId('input-email').fill('not-an-email');
-    await page.getByTestId('btn-submit').click();
-    await expect(page.getByTestId('error-email')).toHaveText('Enter a valid email');
+  test('rejects invalid email and accepts valid input via API payload', async ({ formPage }) => {
+    await formPage.fill('Ada Lovelace', 'not-an-email');
+    let response = await formPage.submitAndWaitForApi();
+    expect(response.status()).toBe(400);
+    expect((await response.json()).errors.email).toBe('Enter a valid email');
+    await expect(formPage.emailError).toHaveText('Enter a valid email');
 
-    await page.getByTestId('input-email').fill('ada@example.com');
-    await page.getByTestId('btn-submit').click();
-    await expect(page.getByTestId('form-success')).toBeVisible();
-    await expect(page.getByTestId('form-success')).toHaveText('Form submitted successfully');
+    await formPage.fill('Ada Lovelace', 'ada@example.com');
+    response = await formPage.submitAndWaitForApi();
+    expect(response.ok()).toBeTruthy();
+    const body = await response.json();
+    expect(body.ok).toBeTruthy();
+    expect(body.contact.email).toBe('ada@example.com');
+
+    await expect(formPage.successMessage).toBeVisible();
+    await expect(formPage.successMessage).toHaveText('Form submitted successfully');
   });
 });

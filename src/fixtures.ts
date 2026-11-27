@@ -33,8 +33,9 @@ export const test = base.extend<Fixtures>({
         '--no-sandbox',
       ],
     });
+    const cameraOrigin = process.env.APP_HOME_URL || 'http://127.0.0.1:4173';
     await context.grantPermissions(['camera'], {
-      origin: 'https://app-freyas.jhavtechninjas.com.au',
+      origin: cameraOrigin.replace(/\/$/, ''),
     });
     await use(context);
     await context.close();

@@ -1,19 +1,19 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../../src/fixtures/demoFixtures';
 
 test.describe('Responsive viewport', () => {
-  test('home layout remains usable on mobile and desktop', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto('/');
-    await expect(page.getByTestId('brand')).toBeVisible();
-    await expect(page.getByTestId('nav-form')).toBeVisible();
-    await expect(page.getByTestId('home-title')).toBeVisible();
+  test('home layout remains usable on mobile and desktop', async ({ homePage }) => {
+    await homePage.page.setViewportSize({ width: 375, height: 812 });
+    await homePage.open();
+    await expect(homePage.brand).toBeVisible();
+    await expect(homePage.navForm).toBeVisible();
+    await expect(homePage.title).toBeVisible();
 
-    const mobileBox = await page.getByTestId('home-title').boundingBox();
+    const mobileBox = await homePage.title.boundingBox();
     expect(mobileBox).not.toBeNull();
     expect(mobileBox!.width).toBeLessThanOrEqual(375);
 
-    await page.setViewportSize({ width: 1280, height: 720 });
-    await expect(page.getByTestId('home-hero')).toBeVisible();
-    await expect(page.getByTestId('nav-items')).toBeVisible();
+    await homePage.page.setViewportSize({ width: 1280, height: 720 });
+    await expect(homePage.hero).toBeVisible();
+    await expect(homePage.navItems).toBeVisible();
   });
 });

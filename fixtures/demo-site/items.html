@@ -9,6 +9,7 @@
     nav a { margin-right: 1rem; }
     li { margin: 0.35rem 0; }
     button { margin-left: 0.5rem; }
+    .error { color: #b00020; }
   </style>
 </head>
 <body>
@@ -21,6 +22,7 @@
   </header>
   <main>
     <h1 data-testid="items-title">Items</h1>
+    <p class="error" data-testid="items-error" hidden></p>
     <input data-testid="item-input" type="text" placeholder="New item" />
     <button data-testid="item-add" type="button">Add</button>
     <ul data-testid="item-list"></ul>
@@ -31,38 +33,67 @@
     const addBtn = document.querySelector('[data-testid="item-add"]');
     const list = document.querySelector('[data-testid="item-list"]');
     const empty = document.querySelector('[data-testid="item-empty"]');
-    let items = [];
+    const error = document.querySelector('[data-testid="items-error"]');
 
-    function render() {
+    function render(items) {
       list.innerHTML = '';
       empty.hidden = items.length > 0;
-      items.forEach((text, index) => {
+      items.forEach((item) => {
         const li = document.createElement('li');
         li.setAttribute('data-testid', 'item-row');
-        li.innerHTML = `<span data-testid="item-text">${text}</span>
-          <button data-testid="item-delete" data-index="${index}" type="button">Delete</button>`;
+        li.innerHTML = `<span data-testid="item-text">${item.title}</span>
+          <button data-testid="item-delete" data-id="${item.id}" type="button">Delete</button>`;
         list.appendChild(li);
       });
     }
 
-    addBtn.addEventListener('click', () => {
-      const value = input.value.trim();
-      if (!value) return;
-      items.push(value);
+    async function loadItems() {
+      error.hidden = true;
+      const response = await fetch('/api/items');
+      const data = await response.json();
+      if (!response.ok) {
+        error.hidden = false;
+        error.textContent = data.error || 'Failed to load items';
+        render([]);
+        return;
+      }
+      render(data.items || []);
+    }
+
+    addBtn.addEventListener('click', async () => {
+      const title = input.value.trim();
+      if (!title) return;
+      const response = await fetch('/api/items', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        error.hidden = false;
+        error.textContent = data.error || 'Failed to add item';
+        return;
+      }
       input.value = '';
-      render();
+      render(data.items || []);
     });
 
-    list.addEventListener('click', (event) => {
+    list.addEventListener('click', async (event) => {
       const target = event.target;
       if (target && target.matches('[data-testid="item-delete"]')) {
-        const index = Number(target.getAttribute('data-index'));
-        items.splice(index, 1);
-        render();
+        const id = target.getAttribute('data-id');
+        const response = await fetch(`/api/items/${id}`, { method: 'DELETE' });
+        const data = await response.json();
+        if (!response.ok) {
+          error.hidden = false;
+          error.textContent = data.error || 'Failed to delete item';
+          return;
+        }
+        render(data.items || []);
       }
     });
 
-    render();
+    loadItems();
   </script>
 </body>
 </html>

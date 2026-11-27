@@ -2,23 +2,23 @@
 
 [![Playwright Tests](https://github.com/testersbench12-code/testersbench-playwright-demo/actions/workflows/playwright.yml/badge.svg)](https://github.com/testersbench12-code/testersbench-playwright-demo/actions/workflows/playwright.yml)
 
-**Instant proof for SaaS founders, CTOs, and engineering leads** — open this repo, see the green CI badge, clone, run tests, and download the HTML report. No video required.
+**Instant proof for SaaS founders, CTOs, and engineering leads** — green CI, Page Object Model, `storageState` auth, hybrid API + UI assertions, Chromium + Firefox, HTML + JUnit reports. No video required.
 
-## What this proves
+## Architecture (what CI proves every run)
 
-A production-style **Playwright + TypeScript** suite with local, deterministic fixtures (no flaky third-party dependency for the core pack). Covered SaaS QA areas:
+| Capability | Implementation |
+|------------|----------------|
+| **Auth / session** | Setup project logs into the local SaaS demo and saves `playwright/.auth/user.json` (`storageState`); authenticated projects reuse it |
+| **Page Object Model** | Zero raw selectors in `tests/core/*.spec.ts` — locators/actions live in `src/pages/demo/` + `src/fixtures/demoFixtures.ts` |
+| **API + UI** | `/api/health`, `/api/login`, `/api/me`, `/api/items`, `/api/contact` with `request` checks and `page.waitForResponse` payload asserts |
+| **Coverage pack** | Smoke/Navigation, Form Validation, CRUD, Responsive Viewports, Negative/Error (incl. 401) |
+| **Browsers** | `chromium` + `firefox` projects (after shared `setup`) |
+| **Resilience** | `retries: 2` on CI, `trace: on-first-retry`, screenshot + video on failure |
+| **Reporting** | HTML report + JUnit (`test-results/junit.xml`) — both uploaded as Actions artifacts |
 
-| Area | What you get |
-|------|----------------|
-| **Smoke & Navigation** | Home loads; nav across Form / Items / Home |
-| **Form Validation** | Required fields + invalid/valid email handling |
-| **Core User Flows** | Add/delete list item (CRUD / state) |
-| **Responsive Viewports** | Mobile (375) and desktop (1280) checks |
-| **Negative / Error Handling** | 404 page + broken-link recovery |
+Local demo app: `fixtures/demo-site` + `scripts/static-server.mjs` (no third-party SaaS dependency for the core pack).
 
-Optional live Freya woman register → verify → admin approve E2E remains in-repo (`RUN_LIVE_E2E=1` + `.env`); default CI/local runs use the core pack above.
-
-## Run locally (copy-paste)
+## Run locally
 
 ```bash
 npm install
@@ -27,21 +27,23 @@ npx playwright test
 npx playwright show-report
 ```
 
-Node.js 18+ (20 recommended). Core tests need no secrets. For live E2E only: copy `.env.example` → `.env` (never commit `.env`).
+Demo login (public showcase creds): `demo@example.com` / `demopass`  
+Auth file is generated at runtime and gitignored (`playwright/.auth/`).
 
-## CI / proof artifact
+## CI artifacts
 
-On every `push` and `pull_request`, GitHub Actions runs `npx playwright test` and **always uploads** the `playwright-report` artifact — download it from the Actions run page to audit results without a local install.
+Every push / pull request runs the full suite and uploads:
 
-Workflow: [`.github/workflows/playwright.yml`](.github/workflows/playwright.yml)
+- `playwright-report` — HTML report
+- `junit-results` — `test-results/junit.xml` for dashboards / gates
 
 ## TestersBench
 
 [TestersBench](https://testersbench.netlify.app) helps SaaS teams ship reliable QA faster:
 
-- **14-day 0-to-1 Playwright setups** — first green suite in two weeks
-- **Legacy suite migrations** — Selenium/Cypress → Playwright without rewriting your product
-- **Dedicated QA retainers** — ongoing coverage as you ship
-- **Manual + automation collaboration** — explorers and pipelines working together
+- **14-day 0-to-1 Playwright setups**
+- **Legacy suite migrations** (Selenium/Cypress → Playwright)
+- **Dedicated QA retainers**
+- **Manual + automation collaboration**
 
-→ Start at [testersbench.netlify.app](https://testersbench.netlify.app)
+→ [testersbench.netlify.app](https://testersbench.netlify.app)

@@ -1,20 +1,36 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../../src/fixtures/demoFixtures';
+import { demoAuth } from '../../src/config/demoAuth';
 
-test.describe('Smoke & navigation', () => {
-  test('loads home and navigates to form and items', async ({ page }) => {
-    await page.goto('/');
-    await expect(page.getByTestId('brand')).toHaveText('TestersBench Demo');
-    await expect(page.getByTestId('home-title')).toBeVisible();
+test.describe('Smoke & navigation + auth session', () => {
+  test('API health is green and authenticated home navigation works', async ({
+    page,
+    request,
+    homePage,
+    formPage,
+    itemsPage,
+  }) => {
+    const health = await request.get('/api/health');
+    expect(health.ok()).toBeTruthy();
+    expect((await health.json()).ok).toBeTruthy();
 
-    await page.getByTestId('nav-form').click();
+    const me = await request.get('/api/me');
+    expect(me.ok()).toBeTruthy();
+    expect((await me.json()).user.email).toBe(demoAuth.email);
+
+    await homePage.open();
+    await expect(homePage.brand).toHaveText('TestersBench Demo');
+    await expect(homePage.title).toBeVisible();
+    await expect(homePage.authState).toContainText(demoAuth.email);
+
+    await homePage.goToForm();
     await expect(page).toHaveURL(/form\.html$/);
-    await expect(page.getByTestId('form-title')).toHaveText('Contact form');
+    await expect(formPage.title).toHaveText('Contact form');
 
-    await page.getByTestId('nav-items').click();
+    await homePage.goToItems();
     await expect(page).toHaveURL(/items\.html$/);
-    await expect(page.getByTestId('items-title')).toHaveText('Items');
+    await expect(itemsPage.title).toHaveText('Items');
 
-    await page.getByTestId('nav-home').click();
-    await expect(page.getByTestId('home-hero')).toBeVisible();
+    await homePage.goToHome();
+    await expect(homePage.hero).toBeVisible();
   });
 });
