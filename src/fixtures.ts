@@ -5,7 +5,7 @@ import * as path from 'path';
 
 const outlookProfile = path.join(
   process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local'),
-  'FreyasChalse',
+  'TestersBench',
   'chrome-outlook-profile',
 );
 

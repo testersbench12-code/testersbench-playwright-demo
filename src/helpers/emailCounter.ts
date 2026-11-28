@@ -5,7 +5,7 @@ import { registerCredentials } from '../config';
 
 const counterFile = path.join(
   process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local'),
-  'FreyasChalse',
+  'TestersBench',
   'registration-counter.txt',
 );
 

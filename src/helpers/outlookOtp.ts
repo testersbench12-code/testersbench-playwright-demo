@@ -98,7 +98,7 @@ function extractOtp(text: string, recipient: string): string | null {
 }
 
 function looksLikeRegistrationMail(text: string): boolean {
-  return /access code|verification code|otp|freya/i.test(text);
+  return /access code|verification code|otp|testersbench|demo/i.test(text);
 }
 
 async function tryReadOtp(page: Page, recipientEmail: string): Promise<string | null> {

@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { adminCredentials, adminFields, urls } from '../config';
+import { adminCredentials, adminFields, adminHostname, urls } from '../config';
 import { bodyText, setReactInput, waitUntil } from '../helpers/dom';
 import { dismissVerificationSuccessPopupIfPresent } from '../helpers/adminSeed';
 
@@ -8,7 +8,7 @@ export class AdminLoginPage {
 
   async open(): Promise<void> {
     await this.page.goto(urls.admin, { waitUntil: 'domcontentloaded' });
-    if (!this.page.url().includes('admin-freyas.jhavtechninjas.com.au')) {
+    if (!this.page.url().includes(adminHostname)) {
       throw new Error(`Admin site did not open: ${this.page.url()}`);
     }
   }

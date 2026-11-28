@@ -23,6 +23,26 @@ export const urls = {
   app: process.env.APP_HOME_URL ?? 'https://example.com/',
 };
 
+/** Hostname helpers derived from configured URLs (no hardcoded company domains). */
+export function hostnameOf(url: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return 'example.com';
+  }
+}
+
+export function cookieDomainsFor(url: string): string[] {
+  const host = hostnameOf(url);
+  const parts = host.split('.').filter(Boolean);
+  const root =
+    parts.length >= 2 ? `.${parts.slice(-2).join('.')}` : host.startsWith('.') ? host : `.${host}`;
+  return Array.from(new Set([host, root, host.replace(/^\./, '')]));
+}
+
+export const appHostname = hostnameOf(urls.app);
+export const adminHostname = hostnameOf(urls.admin);
+
 export const registerFields = {
   woman: 'Woman',
   orientation: 'Straight',

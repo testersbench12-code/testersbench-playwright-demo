@@ -1,12 +1,12 @@
 import { chromium, type Page } from '@playwright/test';
-import { adminCredentials, urls } from '../config';
+import { adminCredentials, registerCredentials, urls } from '../config';
 import { setEmailCounter } from './emailCounter';
 
 /**
- * Align local +N email counter with the highest sunny.lakhani+N account in admin Users.
+ * Align local +N email counter with the highest matching demo email in admin Users.
  */
 export async function seedRegistrationNumberFromAdminOnce(): Promise<void> {
-  const key = '__freyachalice_seeded__';
+  const key = '__testersbench_seeded__';
   if ((globalThis as Record<string, unknown>)[key]) return;
   (globalThis as Record<string, unknown>)[key] = true;
 
@@ -28,8 +28,11 @@ export async function seedRegistrationNumberFromAdminOnce(): Promise<void> {
     await page.goto(urls.users, { waitUntil: 'networkidle' });
     await page.waitForTimeout(2000);
 
+    const prefix = registerCredentials.emailPrefix.replace(/[+]/g, '\\+');
+    const domain = registerCredentials.emailDomain.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const account = new RegExp(`${prefix}(\\d+)[A-Za-z]*${domain}`, 'gi');
+
     let highest = 0;
-    const account = /sunny\.lakhani\+(\d+)[A-Za-z]*@jhavtech\.com/gi;
     for (let i = 0; i < 25; i++) {
       const body = await page.locator('body').innerText();
       for (const match of body.matchAll(account)) {

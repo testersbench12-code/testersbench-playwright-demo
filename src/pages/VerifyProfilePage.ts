@@ -39,7 +39,7 @@ export class VerifyProfilePage {
     await this.page.locator(loc.pageHeading).first().waitFor({ state: 'visible', timeout: 45_000 });
 
     await this.page.context().grantPermissions(['camera'], {
-      origin: 'https://app-freyas.jhavtechninjas.com.au',
+      origin: new URL(urls.app).origin,
     });
 
     try {

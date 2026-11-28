@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { registerCredentials, registerFields, urls } from '../config';
+import { appHostname, cookieDomainsFor, registerCredentials, registerFields, urls } from '../config';
 import { emailAt, getNextStartNumber, setEmailCounter } from '../helpers/emailCounter';
 import { bodyText, setReactInput, waitUntil, xpathLiteral } from '../helpers/dom';
 import { seedRegistrationNumberFromAdminOnce } from '../helpers/adminSeed';
@@ -227,7 +227,7 @@ export class RegisterPage {
     }
     if (await this.page.locator(loc.accountMenu).first().isVisible().catch(() => false)) return true;
     return (
-      this.page.url().includes('app-freyas.jhavtechninjas.com.au') &&
+      this.page.url().includes(appHostname) &&
       !this.page.url().toLowerCase().includes('/register')
     );
   }
@@ -249,11 +249,7 @@ export class RegisterPage {
       /* fall through to cookie clear */
     }
 
-    for (const domain of [
-      'app-freyas.jhavtechninjas.com.au',
-      '.jhavtechninjas.com.au',
-      'jhavtechninjas.com.au',
-    ]) {
+    for (const domain of cookieDomainsFor(urls.app)) {
       await this.page.context().clearCookies({ domain }).catch(() => undefined);
     }
     await this.page.goto(urls.login, { waitUntil: 'networkidle' });
